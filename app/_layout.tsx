@@ -10,6 +10,12 @@ import {
 } from '@expo-google-fonts/inter';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ProfileProvider } from '@/context/ProfileContext';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+
+function StatusBarWithTheme() {
+  const { isDark } = useTheme();
+  return <StatusBar style={isDark ? 'light' : 'dark'} />;
+}
 
 export default function RootLayout() {
   useFrameworkReady();
@@ -26,12 +32,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ProfileProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-        <StatusBar style="dark" />
-      </ProfileProvider>
+      <ThemeProvider>
+        <ProfileProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+          <StatusBarWithTheme />
+        </ProfileProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

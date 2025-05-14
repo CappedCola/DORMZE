@@ -1,20 +1,26 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, MessageSquare, User } from 'lucide-react-native';
+import { Home, MessageSquare, User } from 'lucide-react-native';
+import { useTheme } from '@/context/ThemeContext';
+import { colors } from '@/styles/theme';
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+  const themeColors = colors[theme];
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopColor: '#E5E7EB',
+          backgroundColor: themeColors.tabBar,
+          borderTopColor: themeColors.border,
           height: 60,
           paddingBottom: 8,
         },
-        tabBarActiveTintColor: '#2563EB',
-        tabBarInactiveTintColor: '#6B7280',
-      }}>
+        tabBarActiveTintColor: themeColors.tabBarActive,
+        tabBarInactiveTintColor: themeColors.tabBarInactive,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
@@ -26,7 +32,9 @@ export default function TabLayout() {
         name="messages"
         options={{
           title: 'Messages',
-          tabBarIcon: ({ color, size }) => <MessageSquare size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MessageSquare size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

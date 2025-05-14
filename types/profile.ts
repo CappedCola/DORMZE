@@ -1,38 +1,46 @@
+import {
+  SmokingOption,
+  SleepScheduleOption,
+  PersonalityOption,
+  CleanlinessOption
+} from '@/constants/profileOptions';
+
 export interface Profile {
   id: string;
   name: string;
   age: number;
-  occupation: string;
+  photos: Array<{ url: string; id: string }>;
+  
+  // Education
+  university: string;
+  major: string;
+  year: string;
+  
+  // Basic Info
   bio: string;
+  interests: string[];
+  
+  // Detailed Bio
   detailedBio: {
     aboutMe: string;
     lookingFor: string;
     roommatePreferences: string;
   };
-  university: string;
-  major: string;
-  year: string;
-  interests: string[];
+  
+  // Lifestyle
   lifestyle: {
-    cleanliness: number;
-    sleepSchedule: 'early_bird' | 'night_owl';
-    smoking: boolean;
+    cleanliness: CleanlinessOption;
+    sleepSchedule: SleepScheduleOption;
+    personality: PersonalityOption;
+    smoking: SmokingOption;
     pets: boolean;
-    visitors: 'often' | 'sometimes' | 'rarely';
-    drinking: 'often' | 'sometimes' | 'never';
-    cooking: 'often' | 'sometimes' | 'never';
-    personality: 'introvert' | 'extrovert' | 'ambivert';
   };
-  photos: {
-    url: string;
-    caption?: string;
-  }[];
+  
+  // Move-in Details
+  moveInDate: string;
   budget: {
-    min: number;
-    max: number;
     preferredRange: string;
   };
-  moveInDate: string;
   location: {
     preferred: string;
     maxDistance: number;

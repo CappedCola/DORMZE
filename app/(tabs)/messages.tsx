@@ -1,23 +1,49 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  Pressable,
+} from 'react-native';
 import { useStore } from '@/store/useStore';
+import { useTheme } from '@/context/ThemeContext';
+import { colors } from '@/styles/theme';
+import { Profile } from '@/types/profile';
+import { router } from 'expo-router';
 
 export default function MessagesScreen() {
   const { matches } = useStore();
+  const { theme } = useTheme();
+  const themeColors = colors[theme];
 
-  const renderItem = ({ item: profile }) => (
-    <Pressable style={styles.matchItem}>
-      <Image source={{ uri: profile.photos[0] }} style={styles.avatar} />
+  const navigateToChat = (profileId: string) => {
+    router.push(`/chat/${profileId}`);
+  };
+
+  const renderItem = ({ item: profile }: { item: Profile }) => (
+    <Pressable
+      style={[styles.matchItem, { borderBottomColor: themeColors.border }]}
+      onPress={() => navigateToChat(profile.id)}
+    >
+      <Image source={{ uri: profile.photos[0].url }} style={styles.avatar} />
       <View style={styles.messageContent}>
-        <Text style={styles.name}>{profile.name}</Text>
-        <Text style={styles.preview}>Tap to start chatting!</Text>
+        <Text style={[styles.name, { color: themeColors.text }]}>
+          {profile.name}
+        </Text>
+        <Text style={[styles.preview, { color: themeColors.secondaryText }]}>
+          Tap to start chatting!
+        </Text>
       </View>
     </Pressable>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Messages</Text>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
+      <Text style={[styles.title, { color: themeColors.text }]}>Messages</Text>
       <FlatList
         data={matches}
         renderItem={renderItem}
@@ -31,7 +57,6 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   title: {
     fontFamily: 'Inter_600SemiBold',
@@ -47,7 +72,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   avatar: {
     width: 50,
@@ -65,6 +89,5 @@ const styles = StyleSheet.create({
   preview: {
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#6B7280',
   },
 });

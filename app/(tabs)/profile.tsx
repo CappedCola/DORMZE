@@ -12,9 +12,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useProfile } from '@/context/ProfileContext';
+import { useTheme } from '@/context/ThemeContext';
+import { colors } from '@/styles/theme';
 
 export default function ProfileScreen() {
   const { profile } = useProfile();
+  const { theme } = useTheme();
+  const themeColors = colors[theme];
+
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const nextPhoto = () => {
@@ -33,12 +38,26 @@ export default function ProfileScreen() {
     router.push('/edit-profile');
   };
 
+  const handleSettingsPress = () => {
+    router.push('/settings');
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Profile</Text>
-        <Pressable style={styles.editButton} onPress={handleEditPress}>
-          <Text style={styles.editButtonText}>Edit</Text>
+    <ScrollView
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
+      <View style={[styles.header, { borderBottomColor: themeColors.border }]}>
+        <Text style={[styles.title, { color: themeColors.text }]}>
+          My Profile
+        </Text>
+        <Pressable
+          style={[
+            styles.settingsButton,
+            { backgroundColor: themeColors.primary },
+          ]}
+          onPress={handleSettingsPress}
+        >
+          <Ionicons name="settings-outline" size={24} color="#fff" />
         </Pressable>
       </View>
 
@@ -66,58 +85,96 @@ export default function ProfileScreen() {
             />
           ))}
         </View>
-        <Text style={styles.photoCaption}>
-          {profile.photos[currentPhotoIndex].caption}
-        </Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.name}>
-          {profile.name} <Text style={styles.age}>{profile.age}</Text>
+        <View style={styles.nameContainer}>
+          <Text style={[styles.name, { color: themeColors.text }]}>
+            {profile.name}{' '}
+            <Text style={[styles.age, { color: themeColors.secondaryText }]}>
+              {profile.age}
+            </Text>
+          </Text>
+          <Pressable
+            style={[
+              styles.editButton,
+              { backgroundColor: themeColors.primary },
+            ]}
+            onPress={handleEditPress}
+          >
+            <Text style={styles.editButtonText}>Edit</Text>
+          </Pressable>
+        </View>
+        <Text style={[styles.occupation, { color: themeColors.secondaryText }]}>
+          {profile.occupation}
         </Text>
-        <Text style={styles.occupation}>{profile.occupation}</Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About Me</Text>
-          <Text style={styles.bio}>{profile.bio}</Text>
+        <View
+          style={[styles.section, { borderBottomColor: themeColors.border }]}
+        >
+          <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+            About Me
+          </Text>
+          <Text style={[styles.bio, { color: themeColors.secondaryText }]}>
+            {profile.bio}
+          </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Education</Text>
-          <Text style={styles.detail}>{profile.university}</Text>
-          <Text style={styles.detail}>
+        <View
+          style={[styles.section, { borderBottomColor: themeColors.border }]}
+        >
+          <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+            Education
+          </Text>
+          <Text style={[styles.detail, { color: themeColors.secondaryText }]}>
+            {profile.university}
+          </Text>
+          <Text style={[styles.detail, { color: themeColors.secondaryText }]}>
             {profile.major} • {profile.year}
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Interests</Text>
+        <View
+          style={[styles.section, { borderBottomColor: themeColors.border }]}
+        >
+          <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+            Interests
+          </Text>
           <View style={styles.interestsContainer}>
             {profile.interests.map((interest, index) => (
               <View
                 key={`profile-interest-${interest}-${index}`}
-                style={styles.interestTag}
+                style={[
+                  styles.interestTag,
+                  { backgroundColor: themeColors.inputBackground },
+                ]}
               >
-                <Text style={styles.interestText}>{interest}</Text>
+                <Text
+                  style={[styles.interestText, { color: themeColors.primary }]}
+                >
+                  {interest}
+                </Text>
               </View>
             ))}
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Lifestyle</Text>
-          <Text style={styles.detail}>
+          <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+            Lifestyle
+          </Text>
+          <Text style={[styles.detail, { color: themeColors.secondaryText }]}>
             {profile.lifestyle.smoking ? 'Smoker' : 'Non-smoker'}
           </Text>
-          <Text style={styles.detail}>
+          <Text style={[styles.detail, { color: themeColors.secondaryText }]}>
             {profile.lifestyle.pets ? 'Pet friendly' : 'No pets'}
           </Text>
-          <Text style={styles.detail}>
+          <Text style={[styles.detail, { color: themeColors.secondaryText }]}>
             {profile.lifestyle.sleepSchedule === 'early_bird'
               ? 'Early Bird'
               : 'Night Owl'}
           </Text>
-          <Text style={styles.detail}>
+          <Text style={[styles.detail, { color: themeColors.secondaryText }]}>
             Personality:{' '}
             {profile.lifestyle.personality === 'introvert'
               ? 'Introvert'
@@ -134,7 +191,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -143,21 +199,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 60,
     paddingBottom: 16,
+    borderBottomWidth: 1,
   },
   title: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 24,
   },
-  editButton: {
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+  settingsButton: {
+    padding: 10,
     borderRadius: 20,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  editButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   editButtonText: {
     color: '#fff',
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
+    fontSize: 12,
   },
   photoContainer: {
     position: 'relative',
@@ -201,36 +267,25 @@ const styles = StyleSheet.create({
   photoIndicatorActive: {
     backgroundColor: 'white',
   },
-  photoCaption: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    color: 'white',
-    padding: 8,
-    fontSize: 14,
-    textAlign: 'center',
-  },
   content: {
     padding: 16,
   },
   name: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 24,
-    marginBottom: 4,
   },
   age: {
-    color: '#6B7280',
+    fontFamily: 'Inter_400Regular',
   },
   occupation: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
-    color: '#4B5563',
     marginBottom: 24,
   },
   section: {
     marginBottom: 24,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
   },
   sectionTitle: {
     fontFamily: 'Inter_600SemiBold',
@@ -240,13 +295,11 @@ const styles = StyleSheet.create({
   bio: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
-    color: '#4B5563',
     lineHeight: 24,
   },
   detail: {
     fontFamily: 'Inter_400Regular',
     fontSize: 16,
-    color: '#4B5563',
     marginBottom: 4,
   },
   interestsContainer: {
@@ -255,13 +308,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   interestTag: {
-    backgroundColor: '#EBF5FF',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   interestText: {
-    color: '#2563EB',
     fontFamily: 'Inter_400Regular',
     fontSize: 14,
   },

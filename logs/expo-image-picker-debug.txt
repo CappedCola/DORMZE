@@ -1,0 +1,116 @@
+========================================================================
+EXPO IMAGE PICKER DEBUGGING LOG
+========================================================================
+Date: April 9, 2023 (Updated April 10, 2023)
+
+ISSUE:
+------
+Unable to add photos to user profile using expo-image-picker. 
+When attempting to select a photo, the app crashes.
+
+DEBUG TIMELINE:
+--------------
+
+1. INITIAL PROBLEM:
+   - User unable to add pictures to profile, only delete existing ones
+   - Implemented addNewPhoto function with placeholder image only
+
+2. ATTEMPTED SOLUTION #1:
+   - Installed expo-image-picker: `npx expo install expo-image-picker`
+   - Modified addNewPhoto function to use ImagePicker.launchImageLibraryAsync
+   - Added permission handling with requestMediaLibraryPermissionsAsync
+   - Result: App crashed with error "(NOBRIDGE) ERROR Cannot find native module 'ExponentImagePicker'"
+
+3. ATTEMPTED SOLUTION #2:
+   - Determined that native modules need to be included in development build
+   - Tried running `npx expo prebuild --clean` but was interrupted
+   - Result: Incomplete solution
+
+4. ATTEMPTED SOLUTION #3:
+   - Added permission check in useEffect
+   - Modified image picker code to better handle errors
+   - Result: App still crashes on permission check with "(NOBRIDGE) LOG Media library permission status: undetermined"
+
+5. ATTEMPTED SOLUTION #4:
+   - Updated eas.json to include proper configuration for development build
+   - Added `extends: "production"` and `prebuildCommand: "npx expo-modules-autolinking"`
+   - Created new development build with `eas build --platform ios --profile development`
+   - Result: Module is available! Diagnostic test shows ImagePicker is properly loaded with methods:
+     PermissionStatus, getCameraPermissionsAsync, getMediaLibraryPermissionsAsync, 
+     getPendingResultAsync, launchCameraAsync, launchImageLibraryAsync, 
+     requestCameraPermissionsAsync, requestMediaLibraryPermissionsAsync, 
+     useCameraPermissions, useMediaLibraryPermissions, CameraType, 
+     MediaTypeOptions, UIImagePickerControllerQualityType, 
+     UIImagePickerPreferredAssetRepresentationMode, 
+     UIImagePickerPresentationStyle, VideoExportPreset
+
+6. ATTEMPTED SOLUTION #5:
+   - Created a more robust implementation of addNewPhoto with multiple layers of error handling
+   - Added extensive logging at each step to track where issues might occur
+   - Implemented a separate helper function addPlaceholderPhoto() as a fallback
+   - Key improvements:
+     * Separated permission checking, requesting, and image picking into distinct try/catch blocks
+     * Added console.log statements at each critical step
+     * Ensured fallback to placeholder images if anything fails
+     * Added URI validation to prevent crashes with invalid images
+   - Result: App still crashes when requesting permissions
+
+7. ATTEMPTED SOLUTION #6:
+   - Found that app.json was missing required iOS permission descriptions
+   - iOS requires NSPhotoLibraryUsageDescription to explain to users why the app needs photo access
+   - Added the following permission descriptions to app.json infoPlist:
+     * NSPhotoLibraryUsageDescription
+     * NSCameraUsageDescription
+     * NSMicrophoneUsageDescription
+   - Also added Android permissions for completeness
+   - Created new development build with updated permissions (buildNumber: 4)
+   - Result: App still crashes after checking permission status with these logs:
+     * "Starting image picker process"
+     * "Permission status: undetermined"
+     * "Permission not granted, requesting..."
+
+8. ATTEMPTED SOLUTION #7 (CURRENT):
+   - Bypassed separate permission request step to avoid crash point
+   - Modified image picker implementation to directly call launchImageLibraryAsync
+   - Added more robust error handling and simplified the flow
+   - Created a diagnosis button that shows detailed picker status
+   - Result: Testing in progress - should avoid crashing on permission request
+
+9. ADDED FALLBACK SOLUTION:
+   - Created a new ManualImageInput component to allow URL-based image adding
+   - This provides a reliable alternative that doesn't require camera roll access
+   - Added "Add from URL" button to the profile editor UI
+   - Integrated the component with proper styling and error handling
+   - This gives users a way to add images even if the native image picker fails
+
+CURRENT STATUS:
+--------------
+- Module is properly installed and the development build includes it (confirmed by status check)
+- Permission descriptions are now included in app.json
+- Created new development build with proper permissions (buildNumber: 4)
+- App has multiple ways to add images:
+  1. Direct image picker approach (simpler, avoids separate permission steps)
+  2. Manual URL input as a reliable alternative
+- Diagnostic tools added to help debug the issues
+
+NEXT STEPS:
+----------
+1. Test the new implementation with:
+   ```
+   npx expo start
+   ```
+   (without production flags)
+
+2. If image picker still fails, the URL input method provides a reliable fallback
+
+3. Long-term solutions to consider:
+   - Investigate whether this is a bridgeless mode limitation
+   - Review if different Expo versions handle permissions better
+   - Consider expo-image-picker alternatives if issues persist
+
+RESOURCES:
+---------
+- Expo Image Picker documentation: https://docs.expo.dev/versions/latest/sdk/imagepicker/
+- EAS Build configuration: https://docs.expo.dev/build/eas-json/
+- iOS permissions handling: https://docs.expo.dev/versions/latest/sdk/permissions/
+- Expo Bridgeless mode: https://docs.expo.dev/versions/latest/sdk/bridgeless/ 

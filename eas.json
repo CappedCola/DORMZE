@@ -1,0 +1,38 @@
+{
+  "cli": {
+    "version": ">= 5.9.1",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "extends": "production",
+      "channel": "development",
+      "android": {
+        "buildType": "apk"
+      },
+      "prebuildCommand": "npx expo-modules-autolinking"
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "Dormzedeveloper@gmail.com",
+        "appleTeamId": "2SDNAF3FR6"
+      }
+    }
+  }
+}

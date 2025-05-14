@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Profile } from '@/types/profile';
+import { mockProfiles } from '@/data/mockProfiles';
 
 interface Store {
   profiles: Profile[];
@@ -12,12 +13,18 @@ interface Store {
 
 export const useStore = create<Store>((set) => ({
   profiles: [],
-  matches: [],
+  matches: [mockProfiles[0], mockProfiles[1]],
   currentIndex: 0,
   addMatch: (profile) =>
-    set((state) => ({
-      matches: [...state.matches, profile],
-    })),
+    set((state) => {
+      const profileAlreadyMatched = state.matches.some(match => match.id === profile.id);
+      
+      if (!profileAlreadyMatched) {
+        return { matches: [...state.matches, profile] };
+      }
+      
+      return { matches: state.matches };
+    }),
   setProfiles: (profiles) =>
     set({
       profiles,

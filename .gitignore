@@ -32,3 +32,18 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# testing
+coverage/
+
+# misc
+*.log
+*.lock
+*.tmp
+*.temp
